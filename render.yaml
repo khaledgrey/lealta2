@@ -1,0 +1,24 @@
+services:
+  - type: web
+    name: lealta
+    env: php
+    plan: free
+    buildCommand: |
+      composer install --no-interaction --no-dev --prefer-dist
+      npm install
+      npm run build
+      php artisan migrate --force --seed
+    startCommand: php artisan serve --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: APP_URL
+        value: https://${RENDER_EXTERNAL_URL}
+      - key: APP_KEY
+        generateValue: true
+      - key: DB_CONNECTION
+        value: sqlite
+      - key: DB_DATABASE
+        value: /var/data/database.sqlite
+    disks:
+      - name: data
+        mountPath: /var/data
+        sizeGB: 1
